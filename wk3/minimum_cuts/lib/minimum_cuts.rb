@@ -4,19 +4,10 @@ module MinimumCuts
       graph.freeze
       num_vertices = graph.keys.count
       num_trials = (num_vertices ** 2 * Math.log(num_vertices)).ceil
-      min_cuts = nil
 
-      num_trials.times do |n|
-        count = find_cuts(graph.dup)
-        if min_cuts.nil?
-          min_cuts = count
-        else
-          min_cuts = count if count < min_cuts
-        end
-        puts "iteration #{n}: #{min_cuts}" if n % 1_000 == 0
-      end
-
-      min_cuts
+      (1..num_trials).map {
+        Thread.new { find_cuts(graph.dup) }
+      }.map(&:value).min
     end
 
     def graph_from_file(path)
