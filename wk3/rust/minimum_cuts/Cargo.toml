@@ -7,3 +7,7 @@ authors = ["Britt Lewis <brittlewis12@gmail.com>"]
 [[bin]]
 
 name = "minimum_cuts"
+
+[dependencies]
+
+rand = "0.1"
