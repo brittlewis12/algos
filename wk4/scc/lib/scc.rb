@@ -4,7 +4,7 @@ module SCC
   def self.compute_from_file(file)
     edges = File.readlines(file).map { |line| line.strip.split.map(&:to_i) }.freeze
     sccs = SCC.compute(edges: edges)
-    five_largest = sccs.values.map(&:size).sort { |a, b| b <=> a }.take(5)
+    five_largest = sccs.values.sort { |a, b| b <=> a }.take(5)
 
     return five_largest
   end
@@ -17,7 +17,7 @@ module SCC
 
     $explored = Set.new
     $current_leader = nil
-    $sccs = Hash.new(Set.new)
+    $sccs = Hash.new(0)
     compute_scc(edges: edges)
 
     $sccs
@@ -28,7 +28,6 @@ module SCC
     edges.each do |tail, head|
       rev_adjacency_list[head] += [tail]
     end
-    rev_adjacency_list.freeze
 
     i = edges.flatten.uniq.count
     while i >= 1 do
@@ -45,15 +44,15 @@ module SCC
       adjacency_list[tail] += [head]
     end
 
-    i = edges.flatten.uniq.count
-    while i >= 1 do
+    $i = edges.flatten.uniq.count
+    while $i >= 1 do
       # i is a finishing time
-      s = $finishing_times[i]
+      s = $finishing_times[$i]
       unless $explored.include?(s)
         $current_leader = s
         dfs_loop(adjacency_list: adjacency_list, s: s)
       end
-      i -= 1
+      $i -= 1
     end
   end
 
@@ -63,7 +62,6 @@ module SCC
     next_edges = adjacency_list[s]
     next_edges.each do |v|
       unless $explored.include?(v)
-        puts "unexplored: #{v}"
         dfs_loop_rev(adjacency_list: adjacency_list, s: v)
       end
     end
@@ -74,8 +72,9 @@ module SCC
   # set leaders
   def self.dfs_loop(adjacency_list:, s:)
     $explored.add(s)
-    $sccs[$current_leader] += [s]
+    $sccs[$current_leader] += 1
     next_edges = adjacency_list[s]
+    puts "inside i=#{$i}, #explored: #{$explored.size}" if $explored.size % 10000 == 0
     next_edges.each do |v|
       unless $explored.include?(v)
         dfs_loop(adjacency_list: adjacency_list, s: v)
