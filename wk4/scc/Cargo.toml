@@ -1,0 +1,9 @@
+[package]
+
+name = "scc"
+version = "0.0.1"
+authors = ["Britt Lewis <brittlewis12@gmail.com>"]
+
+[[bin]]
+
+name = "scc"
